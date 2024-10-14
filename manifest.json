@@ -1,0 +1,11 @@
+{
+	"id": "check-and-delete",
+	"name": "Check and Delete",
+	"version": "0.0.1",
+	"minAppVersion": "0.15.0",
+	"description": "Allows user to create temporary lists such that users can delete a list-item with a button",
+	"author": "Danitiate",
+	"authorUrl": "https://obsidian.md",
+	"fundingUrl": "https://obsidian.md/pricing",
+	"isDesktopOnly": false
+}
