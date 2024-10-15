@@ -1,11 +1,10 @@
 import { Plugin } from 'obsidian';
-import AddRibbonTest from './features/RibbonTest';
-import { TaskButtonPlugin } from './features/TaskButtonPlugin';
+import { TaskButtonPlugin } from './features/taskButtonPlugin';
+import addTaskButtonPostProcessorPlugin from './features/taskButtonPostProcessorPlugin';
 
 export default class DeleteLineCheckboxPlugin extends Plugin {
 	async onload() {
-		AddRibbonTest(this);
-
 		this.registerEditorExtension(TaskButtonPlugin);
+		addTaskButtonPostProcessorPlugin(this);
 	}
 }

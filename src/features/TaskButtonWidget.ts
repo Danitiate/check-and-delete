@@ -1,13 +1,15 @@
-import { EditorView, Decoration, ViewPlugin, ViewUpdate, WidgetType, type DecorationSet } from "@codemirror/view";
+import { EditorView, WidgetType } from "@codemirror/view";
 
 export class TaskButtonWidget extends WidgetType {
   toDOM(view: EditorView): HTMLElement {
-    const div = document.createElement("span");
-    div.innerText = "👉"; // Todo: Replace with X button
-    return div;
+    const span = document.createElement("span");
+    span.className = "check-and-delete-task-button"
+    span.onclick = () => {
+      const parent = span.parentNode as HTMLElement;
+      parent.remove();
+    }
+    return span;
   }
-
-  
 }
 
 export default TaskButtonWidget;

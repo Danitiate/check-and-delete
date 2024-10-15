@@ -6,3 +6,28 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+
+.check-and-delete-task-button {
+    color: #FF3333;
+    border: 1px solid #666666;
+    border-radius: 50%;
+    height: 16px;
+    width: 16px;
+    font: 10px Arial;
+    text-align: center;
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.check-and-delete-task-button::after {
+    content: "\274c";
+    position: absolute;
+}
+
+.check-and-delete-task-button:hover {
+    color: #FF0000;
+    background-color: #333333;
+    cursor: pointer;
+}
