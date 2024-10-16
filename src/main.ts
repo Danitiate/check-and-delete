@@ -1,10 +1,8 @@
 import { Plugin } from 'obsidian';
-import { TaskButtonPlugin } from './features/taskButtonPlugin';
-import addTaskButtonPostProcessorPlugin from './features/taskButtonPostProcessorPlugin';
+import addCheckAndDeletePlugin from './plugins/check-and-delete-plugin/checkAndDeletePlugin';
 
 export default class DeleteLineCheckboxPlugin extends Plugin {
 	async onload() {
-		this.registerEditorExtension(TaskButtonPlugin);
-		addTaskButtonPostProcessorPlugin(this);
+		addCheckAndDeletePlugin(this);
 	}
 }

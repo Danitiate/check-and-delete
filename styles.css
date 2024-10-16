@@ -31,3 +31,9 @@ If your plugin does not need CSS, delete this file.
     background-color: #333333;
     cursor: pointer;
 }
+
+.markdown-rendered .check-and-delete-task-button {
+    float: inline-start;
+    margin-inline-start: -24px;
+    top: 0.45em;
+}

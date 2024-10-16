@@ -1,6 +1,6 @@
 import { EditorView, WidgetType } from "@codemirror/view";
 
-export class TaskButtonWidget extends WidgetType {
+export class CheckAndDeleteDecoratorWidget extends WidgetType {
   toDOM(view: EditorView): HTMLElement {
     const span = document.createElement("span");
     span.className = "check-and-delete-task-button"
@@ -12,4 +12,4 @@ export class TaskButtonWidget extends WidgetType {
   }
 }
 
-export default TaskButtonWidget;
+export default CheckAndDeleteDecoratorWidget;
