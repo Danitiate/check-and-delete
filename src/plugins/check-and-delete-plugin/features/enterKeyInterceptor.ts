@@ -1,29 +1,34 @@
 import { keymap } from "@codemirror/view"
-import { EditorState, Prec } from "@codemirror/state"
+import { Prec } from "@codemirror/state"
 import { Plugin } from "obsidian";
 
-function dummyKeymap(tag: string) {
+function insertCheckAndDeletePrefixToNextLine() {
     return keymap.of([{
-        key: "Ctrl-Space",
-        run() { 
-            console.log(tag); 
-            return true 
+        key: "Enter",
+        run(editorView) {
+            const { state } = editorView;
+            const selection = state.selection;
+            const line = state.doc.lineAt(selection.main.head);
+            if (/^\s*-\s*\([xX]\)\s/.test(line.text)) {
+                const startIndex = line.text.indexOf("(x)");
+                const checkAndDeletePrefix = "(x) ";                
+                requestAnimationFrame(() => {
+                    editorView.dispatch(
+                        {
+                            changes: { from: selection.main.head + 1 + startIndex, insert: checkAndDeletePrefix },
+                        }
+                    );
+                })
+            }
+
+            return false // Continue default behavior
         }
     }])
 }
 
-
 function addEnterKeyInterceptor(plugin: Plugin) {
-    let state = EditorState.create({
-        extensions: dummyKeymap("A")
-    });
-
-    
-
-    plugin.registerEditorExtension([
-        dummyKeymap("A"),
-        dummyKeymap("B"),
-        Prec.high(dummyKeymap("C"))]
+    plugin.registerEditorExtension(
+        Prec.high(insertCheckAndDeletePrefixToNextLine())
     );
 }
 
