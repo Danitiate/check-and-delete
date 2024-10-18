@@ -1,53 +1,63 @@
 import { Plugin } from "obsidian";
 import addCheckAndDeletePostProcessor from "./features/checkAndDeletePostProcessor";
 import {
-    EditorView,
-    PluginValue,
-    ViewPlugin,
-    ViewUpdate,
-    type DecorationSet,
-    PluginSpec,
-  } from "@codemirror/view";
+	EditorView,
+	PluginValue,
+	ViewPlugin,
+	ViewUpdate,
+	DecorationSet,
+	PluginSpec,
+} from "@codemirror/view";
+import { RangeSet } from "@codemirror/state";
 import buildDecorations from "./features/decoratorBuilder";
 import moveCursorToEnd from "./features/moveCursorToEnd";
 import addEnterKeyInterceptor from "./features/enterKeyInterceptor";
-  
+import SourceModeHandler from "src/utils/SourceModeHandler";
+
 class CheckAndDeleteDecorator implements PluginValue {
-  decorations: DecorationSet;
+	decorations: DecorationSet;
 
-  constructor(editorView: EditorView) {
-    this.decorations = buildDecorations(editorView);
-  }
+	constructor(editorView: EditorView) {
+		if (SourceModeHandler.isSourceMode) {
+			this.decorations = RangeSet.empty;
+		}
+		else {
+			this.decorations = buildDecorations(editorView);
+		}
+	}
 
-  update(viewUpdate: ViewUpdate) {
-    if (
-      viewUpdate.docChanged ||
-      viewUpdate.viewportChanged ||
-      viewUpdate.selectionSet
-    ) {
-      this.decorations = buildDecorations(viewUpdate.view);
-      if (viewUpdate.docChanged) {
-        moveCursorToEnd(viewUpdate.view);
-      }
-    }
-  }
+	update(viewUpdate: ViewUpdate) {
+		if (SourceModeHandler.isSourceMode) {
+			this.decorations = RangeSet.empty;
+		}
+		else if (
+			viewUpdate.docChanged ||
+			viewUpdate.viewportChanged ||
+			viewUpdate.selectionSet
+		) {
+			this.decorations = buildDecorations(viewUpdate.view);
+			if (viewUpdate.docChanged) {
+				moveCursorToEnd(viewUpdate.view);
+			}
+		}
+	}
 
-  destroy() { }
+	destroy() { }
 }
 
 const pluginSpec: PluginSpec<CheckAndDeleteDecorator> = {
-  decorations: (value: CheckAndDeleteDecorator) => value.decorations
+	decorations: (value: CheckAndDeleteDecorator) => value.decorations
 };
 
 const TaskButtonPlugin = ViewPlugin.fromClass(
-  CheckAndDeleteDecorator,
-  pluginSpec
+	CheckAndDeleteDecorator,
+	pluginSpec
 );
 
 function addCheckAndDeletePlugin(plugin: Plugin) {
-    plugin.registerEditorExtension(TaskButtonPlugin);
-    addCheckAndDeletePostProcessor(plugin);
-    addEnterKeyInterceptor(plugin);
+	plugin.registerEditorExtension(TaskButtonPlugin);
+	addCheckAndDeletePostProcessor(plugin);
+	addEnterKeyInterceptor(plugin);
 }
 
 export default addCheckAndDeletePlugin;

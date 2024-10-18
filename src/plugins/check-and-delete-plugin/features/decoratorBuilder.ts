@@ -6,7 +6,7 @@ import {
 } from "@codemirror/view";
 import CheckAndDeleteDecoratorWidget from "./checkAndDeleteDecoratorWidget";
 
-const BUILD_DECORATIONS_CHECK_AND_DELETE_TASK_BUTTON_REGEX = /^\s*-\s*\([Xx]\)\s/;
+const BUILD_DECORATIONS_CHECK_AND_DELETE_TASK_BUTTON_REGEX = /^\s*-\s\([Xx]\)\s/;
 
 function buildDecorations(editorView: EditorView): DecorationSet {
     const builder = new RangeSetBuilder<Decoration>();
