@@ -9,9 +9,9 @@ function insertCheckAndDeletePrefixToNextLine() {
             const { state } = editorView;
             const selection = state.selection;
             const line = state.doc.lineAt(selection.main.head);
-            if (/^\s*-\s*\([xX]\)\s/.test(line.text)) {
+            if (/^\s*-\s*\([xX]\)\s.+/.test(line.text)) {
                 const startIndex = line.text.indexOf("(x)");
-                const checkAndDeletePrefix = "(x) ";                
+                const checkAndDeletePrefix = "(x) ";
                 requestAnimationFrame(() => {
                     editorView.dispatch(
                         {

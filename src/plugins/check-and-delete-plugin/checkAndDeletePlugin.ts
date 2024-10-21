@@ -36,9 +36,9 @@ class CheckAndDeleteDecorator implements PluginValue {
 			viewUpdate.selectionSet
 		) {
 			this.decorations = buildDecorations(viewUpdate.view);
-			if (viewUpdate.docChanged) {
-				moveCursorToEnd(viewUpdate.view);
-			}
+		}
+		if (viewUpdate.docChanged) {
+			moveCursorToEnd(viewUpdate.view);
 		}
 	}
 

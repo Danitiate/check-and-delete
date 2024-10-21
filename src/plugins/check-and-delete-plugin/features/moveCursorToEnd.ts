@@ -1,11 +1,13 @@
 import { EditorView } from "@codemirror/view";
 
+const MOVE_CURSOR_CHECK_AND_DELETE_TASK_BUTTON_REGEX = /^\s*-\s\([Xx]\)$/;
+
 function moveCursorToEnd(editorView: EditorView) {
     const { state } = editorView;
     const selection = state.selection;
     const line = state.doc.lineAt(selection.main.head);
-
-    if (line.text.trim().startsWith("- (x)") && !line.text.includes("- (x) ")) {
+    
+    if (MOVE_CURSOR_CHECK_AND_DELETE_TASK_BUTTON_REGEX.test(line.text) && selection.main.head < line.to) {
         requestAnimationFrame(() => {
             editorView.dispatch(
                 {

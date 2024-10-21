@@ -19,7 +19,7 @@ function buildDecorations(editorView: EditorView): DecorationSet {
 
             // Match the specific pattern "- (x) " at the start of the line
             if (BUILD_DECORATIONS_CHECK_AND_DELETE_TASK_BUTTON_REGEX.test(lineText)) {
-                var startIndex = lineText.indexOf("-");
+                const startIndex = lineText.indexOf("-");
                 const decoration = Decoration.replace({
                     widget: new CheckAndDeleteDecoratorWidget(),
                 });
