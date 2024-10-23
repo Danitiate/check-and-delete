@@ -13,9 +13,16 @@ function insertCheckAndDeletePrefixToNextLine() {
                 const startIndex = line.text.indexOf("(x)");
                 const checkAndDeletePrefix = "(x) ";
                 requestAnimationFrame(() => {
+                    // Insert checkAndDeletePrefix to new line
                     editorView.dispatch(
                         {
                             changes: { from: selection.main.head + 1 + startIndex, insert: checkAndDeletePrefix },
+                        }
+                    );
+                    // Move the cursor after the insertion
+                    editorView.dispatch(
+                        {
+                            selection: { anchor: selection.main.head + 1 + startIndex + checkAndDeletePrefix.length }
                         }
                     );
                 })
