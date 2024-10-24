@@ -10,6 +10,7 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
+    z-index: 1;
 }
 
 .check-and-delete-task-button::after {
