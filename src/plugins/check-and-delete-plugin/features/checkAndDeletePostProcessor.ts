@@ -1,35 +1,34 @@
-import { MarkdownEditView, MarkdownView, Plugin } from "obsidian";
-import { EditorView } from '@codemirror/view';
+import { Plugin } from "obsidian";
 
 function addCheckAndDeletePostProcessor(plugin: Plugin) {
 	plugin.registerMarkdownPostProcessor((element, context) => {
-		renderCheckAndDeleteInMarkdown(plugin, element);
+		renderCheckAndDeleteInMarkdown(element);
 	});
 }
 
-function renderCheckAndDeleteInMarkdown(plugin: Plugin, element: HTMLElement) {
+function renderCheckAndDeleteInMarkdown(element: HTMLElement) {
 	if(element.className == "el-ul") {
-		iterateCheckAndDeleteChildren(element, plugin)
+		iterateCheckAndDeleteChildren(element)
 	}
 }
 
-function iterateCheckAndDeleteChildren(element: HTMLElement, plugin: Plugin) {
+function iterateCheckAndDeleteChildren(element: HTMLElement) {
 	const children = element.childNodes
 	children.forEach(child => {
 		if(child instanceof HTMLLIElement && /^\s*\([Xx]\)\s/.test(child.textContent ?? "")) {
 			// ListItem contains span and text items -> Recursively iterate children if prefixed with "(x)"
-			iterateCheckAndDeleteChildren(child, plugin)
+			iterateCheckAndDeleteChildren(child)
 		}
 		else if (child instanceof HTMLSpanElement && child.className == "list-bullet") {
 			// If a span element is present in the listItem, it must be a check-and-delete-button
 			child.className = "check-and-delete-task-button";
 			child.onClickEvent(() => {
-				checkAndDeleteHandler(element, plugin)
+				checkAndDeleteHandler(element)
 			})
 		}
 		else if(child instanceof HTMLUListElement) {
 			// UnorderedList contains listItems -> Recursively iterate children
-			iterateCheckAndDeleteChildren(child, plugin)
+			iterateCheckAndDeleteChildren(child)
 		}
 		else if(child instanceof Text) {
 			// Remove prefix "(x) " from rendered text
@@ -42,44 +41,33 @@ function iterateCheckAndDeleteChildren(element: HTMLElement, plugin: Plugin) {
 	})
 }
 
-function checkAndDeleteHandler(listItem: HTMLElement, plugin: Plugin) {
+function checkAndDeleteHandler(listItem: HTMLElement) {
 	deleteElementFromPreview(listItem);
-	deleteElementFromEditor(listItem, plugin)
+	deleteElementFromEditor(listItem)
 }
 
 function deleteElementFromPreview(element: HTMLElement) {
 	element.remove();
 }
 
-async function deleteElementFromEditor(element: HTMLElement, plugin: Plugin) {
-	const activeFile = plugin.app.workspace.getActiveFile();
-	const activeView = plugin.app.workspace.getActiveViewOfType(MarkdownView);
-	const editorView = (activeView?.editor as any).cm as EditorView;
-	const state = editorView.state;
-	
+async function deleteElementFromEditor(element: HTMLElement) {
+	const activeFile = this.app.workspace.getActiveFile();
 	const elementText = getElementText(element)
-	if (activeFile && editorView && elementText) {
-		const fileContent = await plugin.app.vault.read(activeFile);
-		const indexOfDeletedLine = fileContent.indexOf("- (x) " + elementText);
-		const firstLineToDelete = state.doc.lineAt(indexOfDeletedLine);
-		const firstLineToDeleteIndentLevelMatch = firstLineToDelete.text.match(/^\t*/);
-		const firstLineToDeleteIndentLevel = firstLineToDeleteIndentLevelMatch![0].length;
-		let lastPositionToRemove = firstLineToDelete.to + 1;
-		for (let i = firstLineToDelete.number + 1; i < state.doc.lines; i++) {
-			const lastLineToDelete = state.doc.line(i)
-			const lastLineToDeleteIndentLevelMatch = lastLineToDelete.text.match(/^\t*/);
-			const lastLineToDeleteIndentLevel = lastLineToDeleteIndentLevelMatch![0].length;
-			if (lastLineToDeleteIndentLevel > firstLineToDeleteIndentLevel) {
-				lastPositionToRemove = lastLineToDelete.to + 1;
+	if (activeFile && elementText) {
+		const fileContent = await this.app.vault.read(activeFile);
+		const fileLines = fileContent.split("\n");
+		const newFileLines = [];
+		for(let i = 0; i < fileLines.length; i++) {
+			const nextLine = fileLines[i];
+			if (/\s*-\s*\([xX]\)\s/.test(nextLine) && nextLine.endsWith(elementText)) {
+				i = skipChildLines(fileLines, i);
 			}
 			else {
-				break;
+				newFileLines.push(nextLine);
 			}
 		}
 
-		let firstPart = fileContent.substring(0, firstLineToDelete.from);
-		let lastPart = fileContent.substring(lastPositionToRemove)
-		await this.app.vault.modify(activeFile, firstPart + lastPart);
+		await this.app.vault.modify(activeFile, newFileLines.join("\n"));
 	}
 }
 
@@ -88,18 +76,30 @@ function getElementText(element: HTMLElement): string {
 	const children = element.childNodes;
 	for(let i = 0; i < children.length; i++) {
 		const child = children.item(i)
-		// Text element could either be a paragraph element or raw text
-		if (child instanceof Text && !child.nextElementSibling) {
-			elementText = child.data;
-			break;
-		}
-		else if(child instanceof HTMLParagraphElement && child.innerText) {
-			elementText = child.innerText;
+		if (child instanceof Text) {
+			const nextElementSibling = child.nextElementSibling;
+			// Text element could either be a paragraph element or raw text
+			elementText = nextElementSibling instanceof HTMLParagraphElement ? nextElementSibling.innerText : child.data;
 			break;
 		}
 	}
 
-	return elementText;
+	return elementText.trim();
+}
+
+function skipChildLines(fileLines: string[], indexOfDeletedLine: number): number {
+	const deletedLineIndentLevelMatch = fileLines[indexOfDeletedLine].match(/^\t*/);
+	const deletedLineIndentLevel = deletedLineIndentLevelMatch?.[0].length ?? 0;
+	for(let i = indexOfDeletedLine + 1; i < fileLines.length; i++) {
+		const subsequentLineIndentLevelMatch = fileLines[i].match(/^\t*/);
+		const subsequentLineIndentLevel = subsequentLineIndentLevelMatch?.[0].length ?? 0;
+		if (subsequentLineIndentLevel <= deletedLineIndentLevel) {
+			return i - 1;
+		}
+	}
+
+	return fileLines.length;
 }
 
 export default addCheckAndDeletePostProcessor;
+
