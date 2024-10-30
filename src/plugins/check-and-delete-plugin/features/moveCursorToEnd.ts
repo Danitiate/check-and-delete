@@ -1,13 +1,12 @@
 import { EditorView } from "@codemirror/view";
-
-const MOVE_CURSOR_CHECK_AND_DELETE_TASK_BUTTON_REGEX = /^\s*-\s\([Xx]\)$/;
+import { CHECK_AND_DELETE_FULL_PREFIX_EMPTY_LINE_REGEX } from "src/utils/regexConstants";
 
 function moveCursorToEnd(editorView: EditorView) {
     const { state } = editorView;
     const selection = state.selection;
     const line = state.doc.lineAt(selection.main.head);
     
-    if (MOVE_CURSOR_CHECK_AND_DELETE_TASK_BUTTON_REGEX.test(line.text) && selection.main.head < line.to) {
+    if (CHECK_AND_DELETE_FULL_PREFIX_EMPTY_LINE_REGEX.test(line.text) && selection.main.head < line.to) {
         requestAnimationFrame(() => {
             editorView.dispatch(
                 {

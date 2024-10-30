@@ -1,6 +1,7 @@
 import { keymap } from "@codemirror/view"
 import { Prec } from "@codemirror/state"
 import { Plugin } from "obsidian";
+import { CHECK_AND_DELETE_FULL_PREFIX_EMPTY_LINE_REGEX, CHECK_AND_DELETE_FULL_PREFIX_NON_EMPTY_LINE_REGEX, CLOSED_PARANTHESES_X_REGEX, INDEX_OF_PREFIX_REGEX } from "src/utils/regexConstants";
 
 function insertCheckAndDeletePrefixToNextLine() {
     return keymap.of([{
@@ -9,8 +10,8 @@ function insertCheckAndDeletePrefixToNextLine() {
             const { state } = editorView;
             const selection = state.selection;
             const line = state.doc.lineAt(selection.main.head);
-            if (/^\s*-\s*\([xX]\)\s+\S/.test(line.text)) {
-                const startIndexMatch = line.text.match(/\([xX]\)/);
+            if (CHECK_AND_DELETE_FULL_PREFIX_NON_EMPTY_LINE_REGEX.test(line.text)) {
+                const startIndexMatch = line.text.match(CLOSED_PARANTHESES_X_REGEX);
                 const startIndex = startIndexMatch?.index ?? 0;
                 const checkAndDeletePrefix = "(x) ";
                 requestAnimationFrame(() => {
@@ -28,8 +29,8 @@ function insertCheckAndDeletePrefixToNextLine() {
                     );
                 })
             }
-            else if (/^\s*-\s*\([xX]\)\s*$/.test(line.text)) {
-                const startIndexMatch = line.text.match(/-\s*\([xX]\)/);
+            else if (CHECK_AND_DELETE_FULL_PREFIX_EMPTY_LINE_REGEX.test(line.text)) {
+                const startIndexMatch = line.text.match(INDEX_OF_PREFIX_REGEX);
                 if (startIndexMatch?.index ?? 0 > 0) {
                     // If item is indented, remove first indent
                     editorView.dispatch({

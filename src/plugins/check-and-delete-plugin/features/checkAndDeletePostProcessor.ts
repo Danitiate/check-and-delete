@@ -1,4 +1,5 @@
 import { Plugin } from "obsidian";
+import { CHECK_AND_DELETE_NO_HYPHEN_REGEX, CHECK_AND_DELETE_FULL_PREFIX_REGEX, STARTS_WITH_TABS_REGEX } from "src/utils/regexConstants";
 
 function addCheckAndDeletePostProcessor(plugin: Plugin) {
 	plugin.registerMarkdownPostProcessor((element, context) => {
@@ -15,7 +16,7 @@ function renderCheckAndDeleteInMarkdown(element: HTMLElement) {
 function iterateCheckAndDeleteChildren(element: HTMLElement) {
 	const children = element.childNodes
 	children.forEach(child => {
-		if(child instanceof HTMLLIElement && /^\s*\([Xx]\)\s/.test(child.textContent ?? "")) {
+		if(child instanceof HTMLLIElement && CHECK_AND_DELETE_NO_HYPHEN_REGEX.test(child.textContent ?? "")) {
 			// ListItem contains span and text items -> Recursively iterate children if prefixed with "(x)"
 			iterateCheckAndDeleteChildren(child)
 		}
@@ -32,7 +33,7 @@ function iterateCheckAndDeleteChildren(element: HTMLElement) {
 		}
 		else if(child instanceof Text) {
 			// Remove prefix "(x) " from rendered text
-			child.data = child.data.replace(/^\([xX]\)\s/, "")
+			child.data = child.data.replace(CHECK_AND_DELETE_NO_HYPHEN_REGEX, "")
 		}
 		else if(child instanceof HTMLParagraphElement) {
 			const text = child.getText();
@@ -59,7 +60,7 @@ async function deleteElementFromEditor(element: HTMLElement) {
 		const newFileLines: string[] = [];
 		for(let i = 0; i < fileLines.length; i++) {
 			const nextLine = fileLines[i];
-			if (/\s*-\s*\([xX]\)\s/.test(nextLine) && nextLine.endsWith(elementText)) {
+			if (CHECK_AND_DELETE_FULL_PREFIX_REGEX.test(nextLine) && nextLine.endsWith(elementText)) {
 				i = skipChildLines(fileLines, i);
 			}
 			else {
@@ -90,10 +91,10 @@ function getElementText(element: HTMLElement): string {
 }
 
 function skipChildLines(fileLines: string[], indexOfDeletedLine: number): number {
-	const deletedLineIndentLevelMatch = fileLines[indexOfDeletedLine].match(/^\t*/);
+	const deletedLineIndentLevelMatch = fileLines[indexOfDeletedLine].match(STARTS_WITH_TABS_REGEX);
 	const deletedLineIndentLevel = deletedLineIndentLevelMatch?.[0].length ?? 0;
 	for(let i = indexOfDeletedLine + 1; i < fileLines.length; i++) {
-		const subsequentLineIndentLevelMatch = fileLines[i].match(/^\t*/);
+		const subsequentLineIndentLevelMatch = fileLines[i].match(STARTS_WITH_TABS_REGEX);
 		const subsequentLineIndentLevel = subsequentLineIndentLevelMatch?.[0].length ?? 0;
 		if (subsequentLineIndentLevel <= deletedLineIndentLevel) {
 			return i - 1;

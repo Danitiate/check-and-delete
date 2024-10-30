@@ -5,8 +5,7 @@ import {
     type DecorationSet,
 } from "@codemirror/view";
 import CheckAndDeleteDecoratorWidget from "./checkAndDeleteDecoratorWidget";
-
-const BUILD_DECORATIONS_CHECK_AND_DELETE_TASK_BUTTON_REGEX = /^\s*-\s\([Xx]\)\s/;
+import { CHECK_AND_DELETE_FULL_PREFIX_REGEX } from "src/utils/regexConstants";
 
 function buildDecorations(editorView: EditorView): DecorationSet {
     const builder = new RangeSetBuilder<Decoration>();
@@ -18,7 +17,7 @@ function buildDecorations(editorView: EditorView): DecorationSet {
             const lineText = line.text;
 
             // Match the specific pattern "- (x) " at the start of the line
-            if (BUILD_DECORATIONS_CHECK_AND_DELETE_TASK_BUTTON_REGEX.test(lineText)) {
+            if (CHECK_AND_DELETE_FULL_PREFIX_REGEX.test(lineText)) {
                 const startIndex = lineText.indexOf("-");
                 const decoration = Decoration.replace({
                     widget: new CheckAndDeleteDecoratorWidget(),
