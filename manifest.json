@@ -1,11 +1,11 @@
 {
 	"id": "check-and-delete",
 	"name": "Check and Delete",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Allows user to create temporary lists such that users can delete a list-item with a button",
+	"description": "Allows you to quickly clean up temporary list-items with the press of a button",
 	"author": "Danitiate",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"authorUrl": "https://github.com/Danitiate",
+	"fundingUrl": "https://github.com/sponsors/Danitiate",
 	"isDesktopOnly": false
 }
