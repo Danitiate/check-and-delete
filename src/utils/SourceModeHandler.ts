@@ -3,7 +3,7 @@ import { MarkdownView, Plugin } from "obsidian";
 // Class used to determine if the Obsidian Editor is in SourceMode or not
 class SourceModeHandler {
     private static registered = false;
-    public static isSourceMode: boolean = false;
+    public static isSourceMode = false;
 
     public static registerSourceModeEvent(plugin: Plugin) {
         if (!this.registered) {

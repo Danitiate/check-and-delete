@@ -10,7 +10,8 @@ function insertCheckAndDeletePrefixToNextLine() {
             const selection = state.selection;
             const line = state.doc.lineAt(selection.main.head);
             if (/^\s*-\s*\([xX]\)\s+\S/.test(line.text)) {
-                const startIndex = line.text.indexOf("(x)");
+                const startIndexMatch = line.text.match(/\([xX]\)/);
+                const startIndex = startIndexMatch?.index ?? 0;
                 const checkAndDeletePrefix = "(x) ";
                 requestAnimationFrame(() => {
                     // Insert checkAndDeletePrefix to new line
@@ -28,8 +29,8 @@ function insertCheckAndDeletePrefixToNextLine() {
                 })
             }
             else if (/^\s*-\s*\([xX]\)\s*$/.test(line.text)) {
-                let startIndex = line.text.indexOf("- (x)");
-                if (startIndex > 0) {
+                const startIndexMatch = line.text.match(/-\s*\([xX]\)/);
+                if (startIndexMatch?.index ?? 0 > 0) {
                     // If item is indented, remove first indent
                     editorView.dispatch({
                         changes: { from: line.from, to: line.from + 1, insert: "" }

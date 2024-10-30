@@ -35,8 +35,8 @@ function iterateCheckAndDeleteChildren(element: HTMLElement) {
 			child.data = child.data.replace(/^\([xX]\)\s/, "")
 		}
 		else if(child instanceof HTMLParagraphElement) {
-			// Remove prefix "(x) " from rendered text
-			child.innerHTML = child.innerHTML.replace(/^\([xX]\)\s/, "")
+			const text = child.getText();
+			child.setText(text.substring(4)) // Remove prefix "(x) " from rendered text
 		}
 	})
 }
@@ -56,7 +56,7 @@ async function deleteElementFromEditor(element: HTMLElement) {
 	if (activeFile && elementText) {
 		const fileContent = await this.app.vault.read(activeFile);
 		const fileLines = fileContent.split("\n");
-		const newFileLines = [];
+		const newFileLines: string[] = [];
 		for(let i = 0; i < fileLines.length; i++) {
 			const nextLine = fileLines[i];
 			if (/\s*-\s*\([xX]\)\s/.test(nextLine) && nextLine.endsWith(elementText)) {
@@ -67,7 +67,9 @@ async function deleteElementFromEditor(element: HTMLElement) {
 			}
 		}
 
-		await this.app.vault.modify(activeFile, newFileLines.join("\n"));
+		await this.app.vault.process(activeFile, () => {
+			return newFileLines.join("\n")
+		});
 	}
 }
 

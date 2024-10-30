@@ -5,7 +5,7 @@ export class CheckAndDeleteDecoratorWidget extends WidgetType {
 		const span = document.createElement("span");
 		span.className = "check-and-delete-task-button"
 		span.onclick = () => {
-			let toBeRemovedElements = [];
+			const toBeRemovedElements = [];
 			const parent = span.parentNode as HTMLElement;
 			toBeRemovedElements.push(parent)
 			const parentIndentLevel = this.extractIndentLevelFromClassname(parent.className);

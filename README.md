@@ -8,7 +8,8 @@
 
 To use this plugin, create a list item in Obsidian using one of the following formats:
 
-- `- (x) ` or `- (X) `
+- `- (x) `
+- `- (X) `
 
 When you mark an item as complete, simply press the button to delete it instantly.
 
