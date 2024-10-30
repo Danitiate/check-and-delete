@@ -12,37 +12,32 @@ import { RangeSet } from "@codemirror/state";
 import buildDecorations from "./features/decoratorBuilder";
 import moveCursorToEnd from "./features/moveCursorToEnd";
 import addEnterKeyInterceptor from "./features/enterKeyInterceptor";
-import SourceModeHandler from "src/utils/SourceModeHandler";
+import isSourceMode from "src/utils/isSourceMode";
 
 class CheckAndDeleteDecorator implements PluginValue {
 	decorations: DecorationSet;
 
 	constructor(editorView: EditorView) {
-		if (SourceModeHandler.isSourceMode) {
-			this.decorations = RangeSet.empty;
-		}
-		else {
-			this.decorations = buildDecorations(editorView);
-		}
+		this.decorations = this.setDecorationsForMode(editorView);
 	}
 
 	update(viewUpdate: ViewUpdate) {
-		if (SourceModeHandler.isSourceMode) {
-			this.decorations = RangeSet.empty;
-		}
-		else if (
-			viewUpdate.docChanged ||
-			viewUpdate.viewportChanged ||
-			viewUpdate.selectionSet
-		) {
-			this.decorations = buildDecorations(viewUpdate.view);
-		}
+		this.decorations = this.setDecorationsForMode(viewUpdate.view);
 		if (viewUpdate.docChanged) {
 			moveCursorToEnd(viewUpdate.view);
 		}
 	}
 
 	destroy() { }
+
+	private setDecorationsForMode(editorView: EditorView) {
+		if (isSourceMode()) {
+			return RangeSet.empty;
+		}
+		else {
+			return buildDecorations(editorView);
+		}
+	}
 }
 
 const pluginSpec: PluginSpec<CheckAndDeleteDecorator> = {
