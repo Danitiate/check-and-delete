@@ -1,7 +1,7 @@
 {
 	"name": "check-and-delete",
-	"version": "1.0.1",
-	"description": "Allows you to quickly clean up temporary list-items with the press of a button",
+	"version": "1.0.2",
+	"description": "Quickly clean up temporary list-items with the press of a button",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",

@@ -55,22 +55,21 @@ async function deleteElementFromEditor(element: HTMLElement) {
 	const activeFile = this.app.workspace.getActiveFile();
 	const elementText = getElementText(element)
 	if (activeFile && elementText) {
-		const fileContent = await this.app.vault.read(activeFile);
-		const fileLines = fileContent.split("\n");
-		const newFileLines: string[] = [];
-		for(let i = 0; i < fileLines.length; i++) {
-			const nextLine = fileLines[i];
-			if (CHECK_AND_DELETE_FULL_PREFIX_REGEX.test(nextLine) && nextLine.endsWith(elementText)) {
-				i = skipChildLines(fileLines, i);
+		await this.app.vault.process(activeFile, (data: string) => {
+			const fileLines = data.split("\n");
+			const newFileLines: string[] = [];
+			for(let i = 0; i < fileLines.length; i++) {
+				const nextLine = fileLines[i];
+				if (CHECK_AND_DELETE_FULL_PREFIX_REGEX.test(nextLine) && nextLine.endsWith(elementText)) {
+					i = skipChildLines(fileLines, i);
+				}
+				else {
+					newFileLines.push(nextLine);
+				}
 			}
-			else {
-				newFileLines.push(nextLine);
-			}
-		}
 
-		await this.app.vault.process(activeFile, () => {
 			return newFileLines.join("\n")
-		});
+		})
 	}
 }
 
