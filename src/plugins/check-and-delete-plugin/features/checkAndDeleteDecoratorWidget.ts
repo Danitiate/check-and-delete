@@ -2,11 +2,15 @@ import { EditorView, WidgetType } from "@codemirror/view";
 
 export class CheckAndDeleteDecoratorWidget extends WidgetType {
 	toDOM(view: EditorView): HTMLElement {
-		const span = document.createElement("span");
-		span.className = "check-and-delete-task-button"
-		span.onclick = () => {
+		return this.createCheckAndDeleteButton();
+	}
+
+	private createCheckAndDeleteButton() {
+		const checkAndDeleteButton = document.createElement("span");
+		checkAndDeleteButton.className = "check-and-delete-task-button"
+		checkAndDeleteButton.onclick = () => {
 			const toBeRemovedElements = [];
-			const parent = span.parentNode as HTMLElement;
+			const parent = checkAndDeleteButton.parentNode as HTMLElement;
 			toBeRemovedElements.push(parent)
 			const parentIndentLevel = this.extractIndentLevelFromClassname(parent.className);
 			let nextSibling = parent.nextElementSibling
@@ -20,7 +24,16 @@ export class CheckAndDeleteDecoratorWidget extends WidgetType {
 				element.remove();
 			})
 		}
-		return span;
+
+		this.createCheckAndDeleteSvg(checkAndDeleteButton);
+		return checkAndDeleteButton;
+	}
+
+	private createCheckAndDeleteSvg(span: HTMLSpanElement) {
+		const svg = span.createSvg("svg");
+		svg.setAttribute("viewBox", "0 0 100 100");
+		const path = svg.createSvg("path", "check-and-delete-path");
+		path.setAttribute("d", "M15,15 L85,85 M15,85 L85,15");
 	}
 
 	private extractIndentLevelFromClassname(classname: string): number {

@@ -1,9 +1,8 @@
 .check-and-delete-task-button {
-    color: #FF3333;
-    border: 1px solid #666666;
+    border: 1px solid var(--color-base-50);
     border-radius: 50%;
-    height: 16px;
-    width: 16px;
+    height: var(--font-text-size);
+    width: var(--font-text-size);
     font: 10px Arial;
     text-align: center;
     position: relative;
@@ -13,14 +12,8 @@
     z-index: 1;
 }
 
-.check-and-delete-task-button::after {
-    content: "\274c";
-    position: absolute;
-}
-
 .check-and-delete-task-button:hover {
-    color: #FF0000;
-    background-color: #333333;
+    background-color: var(--color-base-30);
     cursor: pointer;
 }
 
@@ -28,4 +21,9 @@
     float: inline-start;
     margin-inline-start: -24px;
     top: 0.45em;
+}
+
+.check-and-delete-path {
+    stroke: #FF3333;
+    stroke-width: 10px;
 }
