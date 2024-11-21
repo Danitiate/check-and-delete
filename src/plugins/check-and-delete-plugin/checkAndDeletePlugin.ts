@@ -13,6 +13,7 @@ import buildDecorations from "./features/decoratorBuilder";
 import moveCursorToEnd from "./features/moveCursorToEnd";
 import addEnterKeyInterceptor from "./features/enterKeyInterceptor";
 import isSourceMode from "src/utils/isSourceMode";
+import addHomeKeyInterceptor from "./features/homeKeyInterceptor";
 
 class CheckAndDeleteDecorator implements PluginValue {
 	decorations: DecorationSet;
@@ -53,6 +54,7 @@ function addCheckAndDeletePlugin(plugin: Plugin) {
 	plugin.registerEditorExtension(TaskButtonPlugin);
 	addCheckAndDeletePostProcessor(plugin);
 	addEnterKeyInterceptor(plugin);
+	addHomeKeyInterceptor(plugin);
 }
 
 export default addCheckAndDeletePlugin;
