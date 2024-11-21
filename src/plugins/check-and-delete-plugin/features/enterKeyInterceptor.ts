@@ -1,7 +1,7 @@
 import { keymap } from "@codemirror/view"
 import { Prec } from "@codemirror/state"
 import { Plugin } from "obsidian";
-import { CHECK_AND_DELETE_FULL_PREFIX_EMPTY_LINE_REGEX, CHECK_AND_DELETE_FULL_PREFIX_NON_EMPTY_LINE_REGEX, CLOSED_PARANTHESES_X_REGEX, INDEX_OF_PREFIX_REGEX } from "src/utils/regexConstants";
+import { CHECK_AND_DELETE_FULL_PREFIX_EMPTY_LINE_REGEX, CHECK_AND_DELETE_FULL_PREFIX_NON_EMPTY_LINE_REGEX, INDEX_OF_PREFIX_REGEX } from "src/utils/regexConstants";
 
 function insertCheckAndDeletePrefixToNextLine() {
     return keymap.of([{
