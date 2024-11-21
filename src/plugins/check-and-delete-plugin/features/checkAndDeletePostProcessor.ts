@@ -1,4 +1,5 @@
 import { Plugin } from "obsidian";
+import createCheckAndDeleteSvg from "src/utils/createCheckAndDeleteSvg";
 import { CHECK_AND_DELETE_NO_HYPHEN_REGEX, CHECK_AND_DELETE_FULL_PREFIX_REGEX, STARTS_WITH_TABS_REGEX } from "src/utils/regexConstants";
 
 function addCheckAndDeletePostProcessor(plugin: Plugin) {
@@ -16,28 +17,23 @@ function renderCheckAndDeleteInMarkdown(element: HTMLElement) {
 function iterateCheckAndDeleteChildren(element: HTMLElement) {
 	const children = element.childNodes
 	children.forEach(child => {
-		if(child instanceof HTMLLIElement && CHECK_AND_DELETE_NO_HYPHEN_REGEX.test(child.textContent ?? "")) {
-			// ListItem contains span and text items -> Recursively iterate children if prefixed with "(x)"
+		if( child instanceof HTMLUListElement || // UnorderedList contains ListItems
+			child instanceof HTMLLIElement || // ListItems contains Span and Text items
+			child instanceof HTMLParagraphElement) { // Paragraph contains Text items
 			iterateCheckAndDeleteChildren(child)
 		}
-		else if (child instanceof HTMLSpanElement && child.className == "list-bullet") {
-			// If a span element is present in the listItem, it must be a check-and-delete-button
+		else if (child instanceof HTMLSpanElement && child.className == "list-bullet" && CHECK_AND_DELETE_NO_HYPHEN_REGEX.test(element.textContent ?? "")) {
+			// If a span element is present in the listItem, it must be a check-and-delete-button if prefixed with (x)
 			child.className = "check-and-delete-task-button";
 			child.onClickEvent(() => {
 				checkAndDeleteHandler(element)
 			})
-		}
-		else if(child instanceof HTMLUListElement) {
-			// UnorderedList contains listItems -> Recursively iterate children
-			iterateCheckAndDeleteChildren(child)
+
+			createCheckAndDeleteSvg(child)
 		}
 		else if(child instanceof Text) {
 			// Remove prefix "(x) " from rendered text
 			child.data = child.data.replace(CHECK_AND_DELETE_NO_HYPHEN_REGEX, "")
-		}
-		else if(child instanceof HTMLParagraphElement) {
-			const text = child.getText();
-			child.setText(text.substring(4)) // Remove prefix "(x) " from rendered text
 		}
 	})
 }

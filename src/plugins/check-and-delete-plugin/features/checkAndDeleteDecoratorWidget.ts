@@ -1,4 +1,5 @@
 import { EditorView, WidgetType } from "@codemirror/view";
+import createCheckAndDeleteSvg from "src/utils/createCheckAndDeleteSvg";
 
 export class CheckAndDeleteDecoratorWidget extends WidgetType {
 	toDOM(view: EditorView): HTMLElement {
@@ -25,15 +26,8 @@ export class CheckAndDeleteDecoratorWidget extends WidgetType {
 			})
 		}
 
-		this.createCheckAndDeleteSvg(checkAndDeleteButton);
+		createCheckAndDeleteSvg(checkAndDeleteButton);
 		return checkAndDeleteButton;
-	}
-
-	private createCheckAndDeleteSvg(span: HTMLSpanElement) {
-		const svg = span.createSvg("svg");
-		svg.setAttribute("viewBox", "0 0 100 100");
-		const path = svg.createSvg("path", "check-and-delete-path");
-		path.setAttribute("d", "M15,15 L85,85 M15,85 L85,15");
 	}
 
 	private extractIndentLevelFromClassname(classname: string): number {
