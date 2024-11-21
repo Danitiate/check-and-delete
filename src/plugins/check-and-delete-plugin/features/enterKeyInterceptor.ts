@@ -11,23 +11,19 @@ function insertCheckAndDeletePrefixToNextLine() {
             const selection = state.selection;
             const line = state.doc.lineAt(selection.main.head);
             if (CHECK_AND_DELETE_FULL_PREFIX_NON_EMPTY_LINE_REGEX.test(line.text)) {
-                const startIndexMatch = line.text.match(CLOSED_PARANTHESES_X_REGEX);
-                const startIndex = startIndexMatch?.index ?? 0;
-                const checkAndDeletePrefix = "(x) ";
-                requestAnimationFrame(() => {
-                    // Insert checkAndDeletePrefix to new line
-                    editorView.dispatch(
-                        {
-                            changes: { from: selection.main.head + 1 + startIndex, insert: checkAndDeletePrefix },
-                        }
-                    );
-                    // Move the cursor after the insertion
-                    editorView.dispatch(
-                        {
-                            selection: { anchor: selection.main.head + 1 + startIndex + checkAndDeletePrefix.length }
-                        }
-                    );
-                })
+                let checkAndDeletePrefix = "\n";
+                checkAndDeletePrefix += line.text.substring(0, line.text.indexOf("-")); // Keep indent level
+                checkAndDeletePrefix += "- (x) ";
+                editorView.dispatch(
+                    {
+                        // Insert checkAndDeletePrefix to new line
+                        changes: { from: selection.main.head, insert: checkAndDeletePrefix },
+                        // Move the cursor after the insertion
+                        selection: { anchor: selection.main.head + checkAndDeletePrefix.length }
+                    }
+                );
+
+                return true;
             }
             else if (CHECK_AND_DELETE_FULL_PREFIX_EMPTY_LINE_REGEX.test(line.text)) {
                 const startIndexMatch = line.text.match(INDEX_OF_PREFIX_REGEX);
@@ -43,6 +39,7 @@ function insertCheckAndDeletePrefixToNextLine() {
                         changes: { from: line.from, to: line.to, insert: "" }
                     })
                 }
+
                 return true;
             }
 
