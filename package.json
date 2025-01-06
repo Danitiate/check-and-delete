@@ -1,6 +1,6 @@
 {
 	"name": "check-and-delete",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "Quickly clean up temporary list-items with the press of a button",
 	"main": "main.js",
 	"scripts": {

@@ -1,7 +1,7 @@
 {
 	"id": "check-and-delete",
 	"name": "Check and Delete",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"minAppVersion": "0.15.0",
 	"description": "Quickly clean up temporary list-items with the press of a button",
 	"author": "Danitiate",
