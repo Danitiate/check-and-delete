@@ -12,7 +12,7 @@ import { RangeSet } from "@codemirror/state";
 import buildDecorations from "./features/decoratorBuilder";
 import moveCursorToEnd from "./features/moveCursorToEnd";
 import addEnterKeyInterceptor from "./features/enterKeyInterceptor";
-import isSourceMode from "src/utils/isSourceMode";
+import { isSourceMode } from "src/utils/getEditorMode";
 import addHomeKeyInterceptor from "./features/homeKeyInterceptor";
 
 class CheckAndDeleteDecorator implements PluginValue {
