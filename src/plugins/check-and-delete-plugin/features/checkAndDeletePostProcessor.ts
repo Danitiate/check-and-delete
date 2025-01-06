@@ -1,4 +1,4 @@
-import { Plugin } from "obsidian";
+import { Plugin, TFile } from "obsidian";
 import createCheckAndDeleteSvg from "src/utils/createCheckAndDeleteSvg";
 import { CHECK_AND_DELETE_NO_HYPHEN_REGEX, CHECK_AND_DELETE_FULL_PREFIX_REGEX, STARTS_WITH_TABS_REGEX } from "src/utils/regexConstants";
 
@@ -48,15 +48,16 @@ function deleteElementFromPreview(element: HTMLElement) {
 }
 
 async function deleteElementFromEditor(element: HTMLElement) {
-	const activeFile = this.app.workspace.getActiveFile();
+	const activeFile: TFile | null = this.app.workspace.getActiveFile();
 	const elementText = getElementText(element)
-	if (activeFile && elementText) {
+	if (activeFile) {
 		await this.app.vault.process(activeFile, (data: string) => {
 			const fileLines = data.split("\n");
 			const newFileLines: string[] = [];
 			for(let i = 0; i < fileLines.length; i++) {
 				const nextLine = fileLines[i];
-				if (CHECK_AND_DELETE_FULL_PREFIX_REGEX.test(nextLine) && nextLine.endsWith(elementText)) {
+				const nextLineText = nextLine.replace(CHECK_AND_DELETE_FULL_PREFIX_REGEX, "");
+				if (CHECK_AND_DELETE_FULL_PREFIX_REGEX.test(nextLine) && nextLineText == elementText) {
 					i = skipChildLines(fileLines, i);
 				}
 				else {
@@ -77,8 +78,18 @@ function getElementText(element: HTMLElement): string {
 		if (child instanceof Text) {
 			const nextElementSibling = child.nextElementSibling;
 			// Text element could either be a paragraph element or raw text
-			elementText = nextElementSibling instanceof HTMLParagraphElement ? nextElementSibling.innerText : child.data;
-			break;
+			elementText += nextElementSibling instanceof HTMLParagraphElement ? nextElementSibling.innerText : child.data;
+		} else if (child instanceof HTMLAnchorElement) {
+			if (child.className.contains("internal-link")) {
+				// Internal links are surrounded by double square brackets in Obsidian
+				elementText += `[[${child.textContent}]]`;
+			}
+			else {
+				let anchorText = child.outerHTML;
+				anchorText = anchorText.replace(" target=\"_blank\"", "")
+				anchorText = anchorText.replace(" rel=\"noopener nofollow\"", "")
+				elementText += anchorText;
+			}
 		}
 	}
 
