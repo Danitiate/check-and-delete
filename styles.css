@@ -25,3 +25,21 @@
     stroke: #FF3333;
     stroke-width: 10px;
 }
+
+.delete-internal-link-button {
+    background-color: #FF3333 !important;
+}
+
+.delete-internal-link-button:hover {
+    background-color: #FF6666 !important;
+}
+
+.delete-internal-links-user-control {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 0.75em;
+    border-top: 1px solid var(--background-modifier-border);
+    position: sticky;
+    bottom: 0;
+    background-color: var(--modal-background);
+}

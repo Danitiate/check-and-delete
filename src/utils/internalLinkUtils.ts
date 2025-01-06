@@ -21,7 +21,5 @@ export function getInternalLinkFiles(resolvedInternalLinks: HTMLElement[]) {
         }
     })
 
-    console.log(linkedFiles);
-
-    return linkedFiles;
+    return linkedFiles.unique();
 }

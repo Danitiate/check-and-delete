@@ -1,6 +1,7 @@
 import { EditorView, WidgetType } from "@codemirror/view";
 import createCheckAndDeleteSvg from "src/utils/createCheckAndDeleteSvg";
 import { getResolvedInternalLinks, getInternalLinkFiles } from "src/utils/internalLinkUtils";
+import { activateDeleteInternalLinksDialogView } from "./deleteInternalLinksDialog";
 
 export class CheckAndDeleteDecoratorWidget extends WidgetType {
 	toDOM(view: EditorView): HTMLElement {
@@ -39,7 +40,8 @@ export class CheckAndDeleteDecoratorWidget extends WidgetType {
 			element.remove();
 		});
 
-		getInternalLinkFiles(internalLinks)
+		const linkedFiles = getInternalLinkFiles(internalLinks)
+		activateDeleteInternalLinksDialogView(linkedFiles);
 	}
 
 	private extractIndentLevelFromClassname(classname: string): number {
