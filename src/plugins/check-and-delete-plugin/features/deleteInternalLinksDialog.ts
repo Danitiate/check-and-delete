@@ -1,11 +1,5 @@
 import { App, Modal, Notice, TFile } from 'obsidian';
 
-export function activateDeleteInternalLinksDialogView(linkedFiles: TFile[]) {
-    if (linkedFiles.length > 0) {
-        new DeleteInternalLinkModal(this.app, linkedFiles).open();
-    }
-}
-
 export class DeleteInternalLinkModal extends Modal {
   constructor(app: App, linkedFiles: TFile[]) {
     super(app);

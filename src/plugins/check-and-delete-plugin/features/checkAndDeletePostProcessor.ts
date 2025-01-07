@@ -1,5 +1,6 @@
 import { Plugin, TFile } from "obsidian";
 import createCheckAndDeleteSvg from "src/utils/createCheckAndDeleteSvg";
+import { findAndDeleteInternallyLinkedFiles } from "src/utils/internalLinkUtils";
 import { CHECK_AND_DELETE_NO_HYPHEN_REGEX, CHECK_AND_DELETE_FULL_PREFIX_REGEX, STARTS_WITH_TABS_REGEX } from "src/utils/regexConstants";
 
 function addCheckAndDeletePostProcessor(plugin: Plugin) {
@@ -39,6 +40,7 @@ function iterateCheckAndDeleteChildren(element: HTMLElement) {
 }
 
 function checkAndDeleteHandler(listItem: HTMLElement) {
+	findAndDeleteInternallyLinkedFiles([listItem]);
 	deleteElementFromPreview(listItem);
 	deleteElementFromEditor(listItem)
 }
