@@ -2,7 +2,7 @@ import { MetadataCache, TFile } from "obsidian";
 import { isPreviewMode } from "./getEditorMode";
 import { DeleteInternalLinkModal } from "src/plugins/check-and-delete-plugin/features/deleteInternalLinksDialog";
 
-const RESOLVED_INTERNAL_LINK_EDITOR_CLASSNAME = '.cm-hmd-internal-link:not(:has(span.is-unresolved))';
+const RESOLVED_INTERNAL_LINK_EDITOR_CLASSNAME = '.cm-hmd-internal-link:not(:has(span.is-unresolved)) > a';
 const RESOLVED_INTERNAL_LINK_PREVIEW_CLASSNAME = '.internal-link:not(.is-unresolved)';
 
 export function findAndDeleteInternallyLinkedFiles(elements: HTMLElement[]) {
@@ -13,11 +13,12 @@ export function findAndDeleteInternallyLinkedFiles(elements: HTMLElement[]) {
     }
 }
 
-function findInternalLinks(elements: HTMLElement[]): HTMLElement[] {
-    const internalLinks: HTMLElement[] = [];
+function findInternalLinks(elements: HTMLElement[]): HTMLAnchorElement[] {
+    const internalLinks: HTMLAnchorElement[] = [];
     elements.forEach(element => {
-        getResolvedInternalLinks(element).forEach(internalLink => {
-            internalLinks.push(internalLink as HTMLElement)
+        const resolvedInternalLinks = getResolvedInternalLinks(element);
+        resolvedInternalLinks.forEach(internalLink => {
+            internalLinks.push(internalLink as HTMLAnchorElement)
         });
     })
 
@@ -30,14 +31,20 @@ function getResolvedInternalLinks(element: HTMLElement): NodeListOf<Element> {
     return internalLinks;
 }
 
-function getInternalLinkFiles(resolvedInternalLinks: HTMLElement[]) {
+function getInternalLinkFiles(resolvedInternalLinks: HTMLAnchorElement[]) {
     const metadataCache: MetadataCache = this.app.metadataCache;
     const activeFile: TFile | null = this.app.workspace.getActiveFile();
     const linkedFiles: TFile[] = [];
     resolvedInternalLinks.forEach(internalLink => {
-        const targetFile = metadataCache.getFirstLinkpathDest(internalLink.innerText, activeFile?.path ?? "")
-        if (targetFile) {
-            linkedFiles.push(targetFile);
+        const files = metadataCache.getCache(activeFile?.path ?? "");
+        if (files && files.links) {
+            const matchingFile = files.links.find(file => file.displayText == internalLink.text);
+            if (matchingFile) {
+                const targetFile = metadataCache.getFirstLinkpathDest(matchingFile.link, activeFile?.path ?? "")
+                if (targetFile) {
+                    linkedFiles.push(targetFile)
+                }
+            }
         }
     })
 

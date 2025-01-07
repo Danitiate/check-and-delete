@@ -63,6 +63,7 @@ export class DeleteInternalLinkModal extends Modal {
                     if (failedDeletes.length > 0) {
                         new Notice(`Failed to delete the following files:\n- ${failedDeletes.join("\n- ")}`, 10000)
                     }
+                    this.close();
                 });
             })
         })
