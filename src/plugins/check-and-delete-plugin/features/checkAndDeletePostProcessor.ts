@@ -83,8 +83,11 @@ function getElementText(element: HTMLElement): string {
 			elementText += nextElementSibling instanceof HTMLParagraphElement ? nextElementSibling.innerText : child.data;
 		} else if (child instanceof HTMLAnchorElement) {
 			if (child.className.contains("internal-link")) {
+				// Handle if displayName doesn't match target
+				const childTarget = getUrlTarget(child.href);
+				const alias = childTarget != child.textContent ? `${childTarget}|` : '';
 				// Internal links are surrounded by double square brackets in Obsidian
-				elementText += `[[${child.textContent}]]`;
+				elementText += `[[${alias}${child.textContent}]]`;
 			}
 			else {
 				let anchorText = child.outerHTML;
@@ -96,6 +99,12 @@ function getElementText(element: HTMLElement): string {
 	}
 
 	return elementText.trim();
+}
+
+function getUrlTarget(href: string) {
+	const url = new URL(href);
+	const relativePath = decodeURIComponent(url.pathname);
+	return relativePath.startsWith('/') ? relativePath.slice(1) : relativePath;
 }
 
 function skipChildLines(fileLines: string[], indexOfDeletedLine: number): number {
