@@ -1,15 +1,18 @@
 import { MetadataCache, TFile } from "obsidian";
 import { isPreviewMode } from "./getEditorMode";
 import { DeleteInternalLinkModal } from "src/plugins/check-and-delete-plugin/features/deleteInternalLinksDialog";
+import DeleteLineCheckboxPlugin from "src/main";
 
 const RESOLVED_INTERNAL_LINK_EDITOR_CLASSNAME = '.cm-hmd-internal-link:not(:has(span.is-unresolved)) > a';
 const RESOLVED_INTERNAL_LINK_PREVIEW_CLASSNAME = '.internal-link:not(.is-unresolved)';
 
-export function findAndDeleteInternallyLinkedFiles(elements: HTMLElement[]) {
-    const internalLinks = findInternalLinks(elements);
-    const linkedFiles = getInternalLinkFiles(internalLinks);
-    if (linkedFiles.length > 0) {
-        new DeleteInternalLinkModal(this.app, linkedFiles).open();
+export function findAndDeleteInternallyLinkedFiles(plugin: DeleteLineCheckboxPlugin, elements: HTMLElement[]) {
+    if (plugin.settings.deleteInternalLinksDialog) {
+        const internalLinks = findInternalLinks(elements);
+        const linkedFiles = getInternalLinkFiles(internalLinks);
+        if (linkedFiles.length > 0) {
+            new DeleteInternalLinkModal(this.app, linkedFiles).open();
+        }
     }
 }
 

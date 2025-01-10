@@ -1,8 +1,16 @@
 import { EditorView, WidgetType } from "@codemirror/view";
+import DeleteLineCheckboxPlugin from "src/main";
 import createCheckAndDeleteSvg from "src/utils/createCheckAndDeleteSvg";
 import { findAndDeleteInternallyLinkedFiles } from "src/utils/internalLinkUtils";
 
 export class CheckAndDeleteDecoratorWidget extends WidgetType {
+	plugin: DeleteLineCheckboxPlugin;
+
+	constructor(plugin: DeleteLineCheckboxPlugin) {
+		super();
+		this.plugin = plugin;
+	}
+
 	toDOM(view: EditorView): HTMLElement {
 		return this.createCheckAndDeleteButton();
 	}
@@ -21,7 +29,7 @@ export class CheckAndDeleteDecoratorWidget extends WidgetType {
 	private deleteLineAndChildren(checkAndDeleteButton: HTMLSpanElement) {
 		const parent = checkAndDeleteButton.parentNode as HTMLElement;
 		const toBeRemovedElements = this.collectToBeRemovedElements(parent);
-		findAndDeleteInternallyLinkedFiles(toBeRemovedElements);
+		findAndDeleteInternallyLinkedFiles(this.plugin, toBeRemovedElements);
 		toBeRemovedElements.forEach(element => {
 			element.remove();
 		});

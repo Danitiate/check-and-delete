@@ -1,33 +1,34 @@
-import { Plugin, TFile } from "obsidian";
+import { TFile } from "obsidian";
+import DeleteLineCheckboxPlugin from "src/main";
 import createCheckAndDeleteSvg from "src/utils/createCheckAndDeleteSvg";
 import { findAndDeleteInternallyLinkedFiles } from "src/utils/internalLinkUtils";
 import { CHECK_AND_DELETE_NO_HYPHEN_REGEX, CHECK_AND_DELETE_FULL_PREFIX_REGEX, STARTS_WITH_TABS_REGEX } from "src/utils/regexConstants";
 
-function addCheckAndDeletePostProcessor(plugin: Plugin) {
+function addCheckAndDeletePostProcessor(plugin: DeleteLineCheckboxPlugin) {
 	plugin.registerMarkdownPostProcessor((element, context) => {
-		renderCheckAndDeleteInMarkdown(element);
+		renderCheckAndDeleteInMarkdown(plugin, element);
 	});
 }
 
-function renderCheckAndDeleteInMarkdown(element: HTMLElement) {
+function renderCheckAndDeleteInMarkdown(plugin: DeleteLineCheckboxPlugin, element: HTMLElement) {
 	if(element.className == "el-ul") {
-		iterateCheckAndDeleteChildren(element)
+		iterateCheckAndDeleteChildren(plugin, element)
 	}
 }
 
-function iterateCheckAndDeleteChildren(element: HTMLElement) {
+function iterateCheckAndDeleteChildren(plugin: DeleteLineCheckboxPlugin, element: HTMLElement) {
 	const children = element.childNodes
 	children.forEach(child => {
 		if( child instanceof HTMLUListElement || // UnorderedList contains ListItems
 			child instanceof HTMLLIElement || // ListItems contains Span and Text items
 			child instanceof HTMLParagraphElement) { // Paragraph contains Text items
-			iterateCheckAndDeleteChildren(child)
+			iterateCheckAndDeleteChildren(plugin, child)
 		}
 		else if (child instanceof HTMLSpanElement && child.className == "list-bullet" && CHECK_AND_DELETE_NO_HYPHEN_REGEX.test(element.textContent ?? "")) {
 			// If a span element is present in the listItem, it must be a check-and-delete-button if prefixed with (x)
 			child.className = "check-and-delete-task-button";
 			child.onClickEvent(() => {
-				checkAndDeleteHandler(element)
+				checkAndDeleteHandler(plugin, element)
 			})
 
 			createCheckAndDeleteSvg(child)
@@ -39,8 +40,8 @@ function iterateCheckAndDeleteChildren(element: HTMLElement) {
 	})
 }
 
-function checkAndDeleteHandler(listItem: HTMLElement) {
-	findAndDeleteInternallyLinkedFiles([listItem]);
+function checkAndDeleteHandler(plugin: DeleteLineCheckboxPlugin, listItem: HTMLElement) {
+	findAndDeleteInternallyLinkedFiles(plugin, [listItem]);
 	deleteElementFromPreview(listItem);
 	deleteElementFromEditor(listItem)
 }
