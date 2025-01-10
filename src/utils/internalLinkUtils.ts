@@ -11,7 +11,7 @@ export function findAndDeleteInternallyLinkedFiles(plugin: DeleteLineCheckboxPlu
         const internalLinks = findInternalLinks(elements);
         const linkedFiles = getInternalLinkFiles(internalLinks);
         if (linkedFiles.length > 0) {
-            new DeleteInternalLinkModal(this.app, linkedFiles).open();
+            new DeleteInternalLinkModal(plugin, linkedFiles).open();
         }
     }
 }

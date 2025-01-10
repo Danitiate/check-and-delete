@@ -63,3 +63,7 @@
     bottom: 0;
     background-color: var(--modal-background);
 }
+
+.hidden-setting {
+    display: none;
+}

@@ -1,22 +1,26 @@
-import { App, Modal, Notice, TFile } from 'obsidian';
+import { Modal, Notice, TFile } from 'obsidian';
+import DeleteLineCheckboxPlugin from 'src/main';
 
 export class DeleteInternalLinkModal extends Modal {
-  constructor(app: App, linkedFiles: TFile[]) {
-    super(app);
-    this.modalEl.classList.add("delete-internal-link-modal")
-    this.titleEl.setText(`Delete ${linkedFiles.length} linked file${linkedFiles.length > 1 ? 's' : ''}?`)
+    private plugin: DeleteLineCheckboxPlugin;
 
-    const modalContent = document.createElement("div");
-    this.addLinkedFilesRows(linkedFiles, modalContent);
+    constructor(plugin: DeleteLineCheckboxPlugin, linkedFiles: TFile[]) {
+        super(plugin.app);
+        this.plugin = plugin;
+        this.modalEl.classList.add("delete-internal-link-modal")
+        this.titleEl.setText(`Delete ${linkedFiles.length} linked file${linkedFiles.length > 1 ? 's' : ''}?`)
 
-    const userControls = modalContent.createDiv({ cls: "delete-internal-links-user-control" });
-    this.addCancelButton(userControls)
-    if (linkedFiles.length > 1) {
-        this.addDeleteAllButton(userControls, linkedFiles)
+        const modalContent = document.createElement("div");
+        this.addLinkedFilesRows(linkedFiles, modalContent);
+
+        const userControls = modalContent.createDiv({ cls: "delete-internal-links-user-control" });
+        this.addCancelButton(userControls)
+        if (linkedFiles.length > 1) {
+            this.addDeleteAllButton(userControls, linkedFiles)
+        }
+
+        this.contentEl.appendChild(modalContent);
     }
-
-    this.contentEl.appendChild(modalContent);
-  }
 
     private addLinkedFilesRows(linkedFiles: TFile[], modalContent: HTMLDivElement) {
         linkedFiles.forEach(linkedFile => {
@@ -84,8 +88,12 @@ export class DeleteInternalLinkModal extends Modal {
     }
 
     private async deleteFile(linkedFile: TFile): Promise<void> {
-        // TODO: trash or delete based on settings
-        return this.app.vault.delete(linkedFile)
+        if (this.plugin.settings.deleteNotesPermanently) {
+            return this.app.vault.delete(linkedFile)
+        }
+        else {
+            return this.app.vault.trash(linkedFile, true)
+        }
     }
 }
 
