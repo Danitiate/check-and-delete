@@ -1,4 +1,3 @@
-import { Plugin } from "obsidian";
 import addCheckAndDeletePostProcessor from "./features/checkAndDeletePostProcessor";
 import {
 	EditorView,
@@ -12,13 +11,17 @@ import { RangeSet } from "@codemirror/state";
 import buildDecorations from "./features/decoratorBuilder";
 import moveCursorToEnd from "./features/moveCursorToEnd";
 import addEnterKeyInterceptor from "./features/enterKeyInterceptor";
-import isSourceMode from "src/utils/isSourceMode";
+import { isSourceMode } from "src/utils/getEditorMode";
 import addHomeKeyInterceptor from "./features/homeKeyInterceptor";
+import { addPluginSettings } from "./settings/checkAndDeleteSettingsTab";
+import DeleteLineCheckboxPlugin from "src/main";
 
 class CheckAndDeleteDecorator implements PluginValue {
+	plugin: DeleteLineCheckboxPlugin;
 	decorations: DecorationSet;
 
-	constructor(editorView: EditorView) {
+	constructor(plugin: DeleteLineCheckboxPlugin, editorView: EditorView) {
+		this.plugin = plugin;
 		this.decorations = this.setDecorationsForMode(editorView);
 	}
 
@@ -36,7 +39,7 @@ class CheckAndDeleteDecorator implements PluginValue {
 			return RangeSet.empty;
 		}
 		else {
-			return buildDecorations(editorView);
+			return buildDecorations(this.plugin, editorView);
 		}
 	}
 }
@@ -45,14 +48,17 @@ const pluginSpec: PluginSpec<CheckAndDeleteDecorator> = {
 	decorations: (value: CheckAndDeleteDecorator) => value.decorations
 };
 
-const TaskButtonPlugin = ViewPlugin.fromClass(
-	CheckAndDeleteDecorator,
-	pluginSpec
-);
+const CheckAndDeleteViewPlugin = (plugin: DeleteLineCheckboxPlugin) => {
+	return ViewPlugin.define((editorView) => 
+		new CheckAndDeleteDecorator(plugin, editorView),
+		pluginSpec
+	)
+}
 
-function addCheckAndDeletePlugin(plugin: Plugin) {
-	plugin.registerEditorExtension(TaskButtonPlugin);
+function addCheckAndDeletePlugin(plugin: DeleteLineCheckboxPlugin) {
+	plugin.registerEditorExtension(CheckAndDeleteViewPlugin(plugin));
 	addCheckAndDeletePostProcessor(plugin);
+	addPluginSettings(plugin);
 	addEnterKeyInterceptor(plugin);
 	addHomeKeyInterceptor(plugin);
 }

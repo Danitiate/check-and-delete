@@ -1,32 +1,34 @@
-import { Plugin, TFile } from "obsidian";
+import { TFile } from "obsidian";
+import DeleteLineCheckboxPlugin from "src/main";
 import createCheckAndDeleteSvg from "src/utils/createCheckAndDeleteSvg";
+import { findAndDeleteInternallyLinkedFiles } from "src/utils/internalLinkUtils";
 import { CHECK_AND_DELETE_NO_HYPHEN_REGEX, CHECK_AND_DELETE_FULL_PREFIX_REGEX, STARTS_WITH_TABS_REGEX } from "src/utils/regexConstants";
 
-function addCheckAndDeletePostProcessor(plugin: Plugin) {
+function addCheckAndDeletePostProcessor(plugin: DeleteLineCheckboxPlugin) {
 	plugin.registerMarkdownPostProcessor((element, context) => {
-		renderCheckAndDeleteInMarkdown(element);
+		renderCheckAndDeleteInMarkdown(plugin, element);
 	});
 }
 
-function renderCheckAndDeleteInMarkdown(element: HTMLElement) {
+function renderCheckAndDeleteInMarkdown(plugin: DeleteLineCheckboxPlugin, element: HTMLElement) {
 	if(element.className == "el-ul") {
-		iterateCheckAndDeleteChildren(element)
+		iterateCheckAndDeleteChildren(plugin, element)
 	}
 }
 
-function iterateCheckAndDeleteChildren(element: HTMLElement) {
+function iterateCheckAndDeleteChildren(plugin: DeleteLineCheckboxPlugin, element: HTMLElement) {
 	const children = element.childNodes
 	children.forEach(child => {
 		if( child instanceof HTMLUListElement || // UnorderedList contains ListItems
 			child instanceof HTMLLIElement || // ListItems contains Span and Text items
 			child instanceof HTMLParagraphElement) { // Paragraph contains Text items
-			iterateCheckAndDeleteChildren(child)
+			iterateCheckAndDeleteChildren(plugin, child)
 		}
 		else if (child instanceof HTMLSpanElement && child.className == "list-bullet" && CHECK_AND_DELETE_NO_HYPHEN_REGEX.test(element.textContent ?? "")) {
 			// If a span element is present in the listItem, it must be a check-and-delete-button if prefixed with (x)
 			child.className = "check-and-delete-task-button";
 			child.onClickEvent(() => {
-				checkAndDeleteHandler(element)
+				checkAndDeleteHandler(plugin, element)
 			})
 
 			createCheckAndDeleteSvg(child)
@@ -38,7 +40,8 @@ function iterateCheckAndDeleteChildren(element: HTMLElement) {
 	})
 }
 
-function checkAndDeleteHandler(listItem: HTMLElement) {
+function checkAndDeleteHandler(plugin: DeleteLineCheckboxPlugin, listItem: HTMLElement) {
+	findAndDeleteInternallyLinkedFiles(plugin, [listItem]);
 	deleteElementFromPreview(listItem);
 	deleteElementFromEditor(listItem)
 }
@@ -81,8 +84,11 @@ function getElementText(element: HTMLElement): string {
 			elementText += nextElementSibling instanceof HTMLParagraphElement ? nextElementSibling.innerText : child.data;
 		} else if (child instanceof HTMLAnchorElement) {
 			if (child.className.contains("internal-link")) {
+				// Handle if displayName doesn't match target
+				const childTarget = getUrlTarget(child.href);
+				const alias = childTarget != child.textContent ? `${childTarget}|` : '';
 				// Internal links are surrounded by double square brackets in Obsidian
-				elementText += `[[${child.textContent}]]`;
+				elementText += `[[${alias}${child.textContent}]]`;
 			}
 			else {
 				let anchorText = child.outerHTML;
@@ -94,6 +100,12 @@ function getElementText(element: HTMLElement): string {
 	}
 
 	return elementText.trim();
+}
+
+function getUrlTarget(href: string) {
+	const url = new URL(href);
+	const relativePath = decodeURIComponent(url.pathname);
+	return relativePath.startsWith('/') ? relativePath.slice(1) : relativePath;
 }
 
 function skipChildLines(fileLines: string[], indexOfDeletedLine: number): number {

@@ -1,6 +1,17 @@
 import { MarkdownView } from "obsidian";
 
-function isSourceMode() {
+export function isPreviewMode() {
+    const view = this.app.workspace.getActiveViewOfType(MarkdownView)        
+    if (view) {
+        if (view.getMode() == "preview") {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+export function isSourceMode() {
     const view = this.app.workspace.getActiveViewOfType(MarkdownView)        
     if (view) {
         if (view.getMode() == "preview") {
@@ -15,5 +26,3 @@ function isSourceMode() {
 
     return false;
 }
-
-export default isSourceMode;

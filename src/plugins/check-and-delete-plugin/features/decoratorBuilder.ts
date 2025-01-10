@@ -6,8 +6,9 @@ import {
 } from "@codemirror/view";
 import CheckAndDeleteDecoratorWidget from "./checkAndDeleteDecoratorWidget";
 import { CHECK_AND_DELETE_FULL_PREFIX_REGEX } from "src/utils/regexConstants";
+import DeleteLineCheckboxPlugin from "src/main";
 
-function buildDecorations(editorView: EditorView): DecorationSet {
+function buildDecorations(plugin: DeleteLineCheckboxPlugin, editorView: EditorView): DecorationSet {
     const builder = new RangeSetBuilder<Decoration>();
     const { doc: document } = editorView.state;
 
@@ -20,7 +21,7 @@ function buildDecorations(editorView: EditorView): DecorationSet {
             if (CHECK_AND_DELETE_FULL_PREFIX_REGEX.test(lineText)) {
                 const startIndex = lineText.indexOf("-");
                 const decoration = Decoration.replace({
-                    widget: new CheckAndDeleteDecoratorWidget(),
+                    widget: new CheckAndDeleteDecoratorWidget(plugin),
                 });
 
                 builder.add(line.from + startIndex, line.from + startIndex + 5, decoration);

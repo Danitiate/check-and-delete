@@ -25,3 +25,45 @@
     stroke: #FF3333;
     stroke-width: 10px;
 }
+
+.delete-internal-link-modal {
+    padding-bottom: 0;
+}
+
+.delete-internal-link-item-row {
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75em 0;
+}
+
+.delete-internal-link-item-row-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    direction: rtl;
+    text-align: left;
+}
+
+.delete-internal-link-button {
+    background-color: #FF3333 !important;
+    margin-left: 0.75em;
+}
+
+.delete-internal-link-button:hover {
+    background-color: #FF6666 !important;
+}
+
+.delete-internal-links-user-control {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75em 0;
+    border-top: 1px solid var(--background-modifier-border);
+    position: sticky;
+    bottom: 0;
+    background-color: var(--modal-background);
+}
+
+.hidden-setting {
+    display: none;
+}
